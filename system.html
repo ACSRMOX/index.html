@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统状态 - 波奇酱的网站</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .system-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .navigation {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 10px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: rgba(102, 126, 234, 0.3);
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .status-good { background: #4ade80; }
+        .status-warning { background: #fbbf24; }
+        .status-error { background: #ef4444; }
+        
+        .progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-cpu { background: linear-gradient(90deg, #667eea, #764ba2); }
+        .progress-memory { background: linear-gradient(90deg, #4facfe, #00f2fe); }
+        .progress-disk { background: linear-gradient(90deg, #43e97b, #38f9d7); }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .process-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        .process-item {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        @media (max-width: 768px) {
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .navigation {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="system-container">
+            <!-- 导航 -->
+            <div class="navigation">
+                <a href="index.html" class="nav-btn">🏠 首页</a>
+                <a href="binance.html" class="nav-btn">📊 币安监控</a>
+                <a href="system.html" class="nav-btn active">🖥️ 系统状态</a>
+                <a href="chat.html" class="nav-btn">🤖 AI聊天</a>
+                <a href="about.html" class="nav-btn">ℹ️ 关于</a>
+            </div>
+            
+            <!-- 页面头部 -->
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h1>🖥️ 系统状态监控</h1>
+                <p>实时监控计算机系统状态（模拟数据）</p>
+                <p class="status-badge">最后更新: <span id="system-last-update">--:--:--</span></p>
+            </div>
+            
+            <!-- 状态网格 -->
+            <div class="status-grid">
+                <!-- CPU状态 -->
+                <div class="status-card">
+                    <div class="status-header">
+                        <h2>⚡ CPU使用率</h2>
+                        <div>
+                            <span class="status-indicator status-good"></span>
+                            <span>正常</span>
+                        </div>
+                    </div>
+                    <div class="metric-value" id="cpu-usage">54%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-cpu" id="cpu-progress" style="width: 54%;"></div>
+                    </div>
+                    <p>处理器: Intel Core i7-10750H</p>
+                    <p>核心数: 6核12线程</p>
+                    <p>频率: 2.60 GHz</p>
+                </div>
+                
+                <!-- 内存状态 -->
+                <div class="status-card">
+                    <div class="status-header">
+                        <h2>💾 内存使用</h2>
+                        <div>
+                            <span class="status-indicator status-warning"></span>
+                            <span>注意</span>
+                        </div>
+                    </div>
+                    <div class="metric-value" id="memory-usage">8.2/16.0 GB</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-memory" id="memory-progress" style="width: 51%;"></div>
+                    </div>
+                    <p>已使用: 8.2 GB (51%)</p>
+                    <p>可用: 7.8 GB</p>
+                    <p>类型: DDR4 2933MHz</p>
+                </div>
+                
+                <!-- 磁盘状态 -->
+                <div class="status-card">
+                    <div class="status-header">
+                        <h2>💿 磁盘空间</h2>
+                        <div>
+                            <span class="status-indicator status-good"></span>
+                            <span>良好</span>
+                        </div>
+                    </div>
+                    <div class="metric-value" id="disk-usage">46/149 GB</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-disk" id="disk-progress" style="width: 31%;"></div>
+                    </div>
+                    <p>C盘: 46.3 GB / 148.9 GB (31%)</p>
+                    <p>D盘: 15.2 GB / 465.8 GB (3%)</p>
+                    <p>文件系统: NTFS</p>
+                </div>
+                
+                <!-- 网络状态 -->
+                <div class="status-card">
+                    <div class="status-header">
+                        <h2>🌐 网络连接</h2>
+                        <div>
+                            <span class="status-indicator status-good"></span>
+                            <span>正常</span>
+                        </div>
+                    </div>
+                    <div class="metric-value" id="network-status">在线</div>
+                    <p>连接类型: Wi-Fi</p>
+                    <p>IP地址: 192.168.1.105</p>
+                    <p>延迟: 57 ms (8.8.8.8)</p>
+                    <p>下载速度: 85.2 Mbps</p>
+                    <p>上传速度: 23.7 Mbps</p>
+                </div>
+                
+                <!-- 进程监控 -->
+                <div class="status-card" style="grid-column: span 2;">
+                    <div class="status-header">
+                        <h2>📋 进程监控</h2>
+                        <button onclick="refreshProcesses()" class="control-btn" style="padding: 8px 15px; font-size: 0.9rem;">
+                            🔄 刷新
+                        </button>
+                    </div>
+                    <div class="process-list" id="process-list">
+                        <div class="process-item">
+                            <span>AutoClaw</span>
+                            <span>174 MB</span>
+                        </div>
+                        <div class="process-item">
+                            <span>Windows Defender</span>
+                            <span>489 MB</span>
+                        </div>
+                        <div class="process-item">
+                            <span>Feishu</span>
+                            <span>285 MB</span>
+                        </div>
+                        <div class="process-item">
+                            <span>Chrome</span>
+                            <span>412 MB</span>
+                        </div>
+                        <div class="process-item">
+                            <span>Node.js</span>
+                            <span>128 MB</span>
+                        </div>
+                    </div>
+                    <p style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">
+                        显示前5个内存占用进程
+                    </p>
+                </div>
+            </div>
+            
+            <!-- 系统信息 -->
+            <div class="status-card" style="margin-top: 20px;">
+                <h2>ℹ️ 系统信息</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                    <div>
+                        <p><strong>操作系统:</strong> Windows 11 企业版</p>
+                        <p><strong>版本:</strong> 22H2 (Build 22621)</p>
+                        <p><strong>架构:</strong> 64位</p>
+                    </div>
+                    <div>
+                        <p><strong>启动时间:</strong> <span id="uptime">2小时55分钟</span></p>
+                        <p><strong>最后更新:</strong> 2026-03-11</p>
+                        <p><strong>安全状态:</strong> 受保护</p>
+                    </div>
+                    <div>
+                        <p><strong>主机名:</strong> DESKTOP-3PJ8R8B</p>
+                        <p><strong>用户名:</strong> open</p>
+                        <p><strong>时区:</strong> Asia/Shanghai (UTC+8)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 控制面板 -->
+            <div class="status-card" style="margin-top: 20px;">
+                <h2>⚙️ 控制面板</h2>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button onclick="refreshAllMetrics()" class="control-btn">
+                        🔄 刷新所有指标
+                    </button>
+                    <button onclick="simulateProblem()" class="control-btn" style="background: rgba(239, 68, 68, 0.2);">
+                        🧪 模拟问题
+                    </button>
+                    <button onclick="resetMetrics()" class="control-btn" style="background: rgba(74, 222, 128, 0.2);">
+                        🔧 重置指标
+                    </button>
+                    <button onclick="toggleAutoRefresh()" class="control-btn">
+                        ⏱️ 自动刷新: <span id="auto-refresh-status">开启</span>
+                    </button>
+                </div>
+                <p style="margin-top: 15px; font-size: 0.9rem; opacity: 0.8;">
+                    注意: 此页面使用模拟数据，真实系统监控需要相应权限
+                </p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2026 波奇酱制作 | 系统状态监控 | 数据: 模拟</p>
+        </footer>
+    </div>
+    
+    <script src="system.js"></script>
+</body>
+</html>

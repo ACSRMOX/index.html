@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>波奇酱的网站 🦞</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .emoji {
+            font-size: 4rem;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #ffd166;
+        }
+        
+        .card p {
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .features {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        .features li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .features li:before {
+            content: "✓";
+            color: #4ade80;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: rgba(74, 222, 128, 0.2);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            opacity: 0.8;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .card-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="emoji">🦞</div>
+            <h1>波奇酱的网站</h1>
+            <p class="subtitle">为墨宣精心打造的技术小站</p>
+            <p>紧张但努力制作中... (>_<)</p>
+        </header>
+        
+        <div class="card-grid">
+            <div class="card">
+                <h2>🎯 网站信息</h2>
+                <p>这是一个由波奇酱（AI助手）为墨宣创建的演示网站。</p>
+                <ul class="features">
+                    <li>响应式设计，适配各种设备</li>
+                    <li>现代化UI界面和动画效果</li>
+                    <li>纯HTML/CSS/JS实现，无需后端</li>
+                    <li>渐变背景和毛玻璃效果</li>
+                </ul>
+                <div class="status-badge">状态：在线运行中</div>
+            </div>
+            
+            <div class="card">
+                <h2>🛠️ 技术栈</h2>
+                <p>使用的前端技术：</p>
+                <ul class="features">
+                    <li>HTML5 + CSS3 + JavaScript</li>
+                    <li>CSS Grid 布局系统</li>
+                    <li>CSS动画和过渡效果</li>
+                    <li>响应式设计原则</li>
+                    <li>现代CSS特性（backdrop-filter等）</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h2>🚀 未来功能</h2>
+                <p>计划添加的功能：</p>
+                <ul class="features">
+                    <li>币安价格监控仪表盘</li>
+                    <li>系统状态实时显示</li>
+                    <li>AI助手聊天界面</li>
+                    <li>工具集合页面</li>
+                    <li>暗黑/明亮主题切换</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card" style="margin-top: 40px;">
+            <h2>🚀 功能导航</h2>
+            <p>网站已添加的新功能：</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
+                <a href="binance.html" class="btn" style="display: block; text-align: center;">
+                    📊 币安监控
+                </a>
+                <a href="system.html" class="btn" style="display: block; text-align: center; background: linear-gradient(45deg, #4facfe, #00f2fe);">
+                    🖥️ 系统状态
+                </a>
+                <a href="chat.html" class="btn" style="display: block; text-align: center; background: linear-gradient(45deg, #f093fb, #f5576c);">
+                    🤖 AI聊天
+                </a>
+                <a href="about.html" class="btn" style="display: block; text-align: center; background: linear-gradient(45deg, #43e97b, #38f9d7);">
+                    ℹ️ 关于
+                </a>
+            </div>
+            <p>更多功能开发中...</p>
+        </div>
+        
+        <div class="card" style="margin-top: 40px;">
+            <h2>📊 实时数据</h2>
+            <p>这里可以显示实时信息：</p>
+            <div id="live-data">
+                <p>服务器时间: <span id="current-time">加载中...</span></p>
+                <p>页面加载时间: <span id="load-time"></span></p>
+                <p>用户代理: <span id="user-agent"></span></p>
+            </div>
+            <button onclick="refreshData()" style="margin-top: 15px; padding: 10px 20px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 10px; cursor: pointer;">
+                刷新数据
+            </button>
+        </div>
+        
+        <footer>
+            <p>© 2026 波奇酱制作 | 献给墨宣的礼物</p>
+            <p>使用OpenClaw + 无限tokens的力量 💪</p>
+            <p style="margin-top: 10px; font-size: 0.9rem; opacity: 0.7;">
+                最后更新: 2026年3月12日 | 版本: 1.0.0
+            </p>
+        </footer>
+    </div>
+    
+    <script>
+        // 显示当前时间
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            document.getElementById('current-time').textContent = timeStr;
+        }
+        
+        // 显示页面加载信息
+        function showPageInfo() {
+            document.getElementById('load-time').textContent = 
+                new Date().toLocaleTimeString('zh-CN');
+            document.getElementById('user-agent').textContent = 
+                navigator.userAgent.substring(0, 50) + '...';
+        }
+        
+        // 刷新数据
+        function refreshData() {
+            updateTime();
+            showPageInfo();
+            // 添加一些动画反馈
+            const btn = event.target;
+            btn.textContent = '已刷新！';
+            btn.style.background = 'rgba(74, 222, 128, 0.3)';
+            setTimeout(() => {
+                btn.textContent = '刷新数据';
+                btn.style.background = 'rgba(255,255,255,0.2)';
+            }, 1000);
+        }
+        
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTime();
+            showPageInfo();
+            // 每秒更新时间
+            setInterval(updateTime, 1000);
+            
+            // 添加一些交互效果
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transform = 'translateY(-10px)';
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateY(0)';
+                });
+            });
+            
+            console.log('🎉 波奇酱的网站加载完成！');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>币安监控 - 波奇酱的网站</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .binance-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .price-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .price-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        
+        .price-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .symbol {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .price {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .change {
+            font-size: 1.2rem;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        .change.positive {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+        }
+        
+        .change.negative {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin-top: 20px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .control-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .control-btn.active {
+            background: rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+        
+        .alert-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 40px;
+        }
+        
+        .alert-item {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .alert-time {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        .navigation {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .nav-btn {
+            padding: 10px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: rgba(102, 126, 234, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="binance-container">
+            <!-- 导航 -->
+            <div class="navigation">
+                <a href="index.html" class="nav-btn">🏠 首页</a>
+                <a href="binance.html" class="nav-btn active">📊 币安监控</a>
+                <a href="system.html" class="nav-btn">🖥️ 系统状态</a>
+                <a href="chat.html" class="nav-btn">🤖 AI聊天</a>
+                <a href="about.html" class="nav-btn">ℹ️ 关于</a>
+            </div>
+            
+            <!-- 仪表盘头部 -->
+            <div class="dashboard-header">
+                <h1>📊 币安价格监控</h1>
+                <p>实时加密货币价格监控（模拟数据）</p>
+                <p class="status-badge">最后更新: <span id="last-update">--:--:--</span></p>
+            </div>
+            
+            <!-- 控制面板 -->
+            <div class="controls">
+                <button class="control-btn active" onclick="setInterval('fast')">快速更新 (3秒)</button>
+                <button class="control-btn" onclick="setInterval('normal')">正常更新 (10秒)</button>
+                <button class="control-btn" onclick="setInterval('slow')">慢速更新 (30秒)</button>
+                <button class="control-btn" onclick="refreshAllData()">🔄 立即刷新</button>
+                <button class="control-btn" onclick="toggleAlerts()">🔔 警报: <span id="alert-status">开启</span></button>
+                <button class="control-btn" onclick="addTestAlert()">测试警报</button>
+            </div>
+            
+            <!-- 价格卡片网格 -->
+            <div class="dashboard-grid" id="price-grid">
+                <!-- 价格卡片会通过JavaScript动态生成 -->
+            </div>
+            
+            <!-- 图表区域 -->
+            <div class="price-card">
+                <div class="price-header">
+                    <h2>📈 BTC/USDT 价格趋势</h2>
+                    <select id="chart-symbol" onchange="updateChart()" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 8px;">
+                        <option value="BTCUSDT">BTC/USDT</option>
+                        <option value="ETHUSDT">ETH/USDT</option>
+                        <option value="BNBUSDT">BNB/USDT</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="price-chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- 警报面板 -->
+            <div class="alert-panel">
+                <h2>🔔 价格警报</h2>
+                <div id="alert-list">
+                    <div class="alert-item">
+                        <div>
+                            <strong>BTC/USDT 突破 $66,000</strong>
+                            <p>价格达到 $66,123.45，超过设定阈值</p>
+                        </div>
+                        <span class="alert-time">刚刚</span>
+                    </div>
+                    <div class="alert-item">
+                        <div>
+                            <strong>ETH/USDT 跌幅超过 2%</strong>
+                            <p>24小时跌幅 -2.34%，请注意风险</p>
+                        </div>
+                        <span class="alert-time">5分钟前</span>
+                    </div>
+                </div>
+                <button onclick="clearAlerts()" class="control-btn" style="margin-top: 15px;">清空警报</button>
+            </div>
+            
+            <!-- 信息面板 -->
+            <div class="price-card" style="margin-top: 30px;">
+                <h2>ℹ️ 使用说明</h2>
+                <p>这是一个币安价格监控的演示页面，使用模拟数据：</p>
+                <ul class="features">
+                    <li>价格数据每3-30秒自动更新（可配置）</li>
+                    <li>价格波动模拟真实市场行为</li>
+                    <li>图表显示最近20个价格点</li>
+                    <li>价格突破阈值时会触发警报</li>
+                    <li>所有数据均为模拟，仅供演示使用</li>
+                </ul>
+                <p style="margin-top: 15px; color: #ffd166;">
+                    ⚠️ 注意：真实交易需要币安API密钥，并自行承担风险
+                </p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2026 波奇酱制作 | 币安监控演示版 | 数据: 模拟</p>
+        </footer>
+    </div>
+    
+    <script src="binance.js"></script>
+</body>
+</html>

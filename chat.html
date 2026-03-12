@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI聊天 - 波奇酱的网站</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .chat-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 100px);
+        }
+        
+        .navigation {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 10px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: rgba(102, 126, 234, 0.3);
+        }
+        
+        .chat-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .chat-main {
+            display: flex;
+            flex: 1;
+            gap: 30px;
+            min-height: 0;
+        }
+        
+        .chat-sidebar {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow-y: auto;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 10px;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .message.user {
+            margin-left: auto;
+        }
+        
+        .message-content {
+            padding: 15px 20px;
+            border-radius: 20px;
+            position: relative;
+            word-wrap: break-word;
+        }
+        
+        .message.bot .message-content {
+            background: rgba(102, 126, 234, 0.3);
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message.user .message-content {
+            background: rgba(74, 222, 128, 0.3);
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message-sender {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+        
+        .message-time {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 15px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-input textarea {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: none;
+            min-height: 60px;
+            max-height: 120px;
+        }
+        
+        .chat-input textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .chat-input button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            padding: 0 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-input button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .chat-input button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .preset-question {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .preset-question:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 15px 20px;
+            background: rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            border-bottom-left-radius: 5px;
+            width: fit-content;
+            margin-bottom: 20px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+            30% { transform: translateY(-10px); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 900px) {
+            .chat-main {
+                flex-direction: column;
+            }
+            
+            .chat-sidebar {
+                width: 100%;
+                max-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="chat-container">
+            <!-- 导航 -->
+            <div class="navigation">
+                <a href="index.html" class="nav-btn">🏠 首页</a>
+                <a href="binance.html" class="nav-btn">📊 币安监控</a>
+                <a href="system.html" class="nav-btn">🖥️ 系统状态</a>
+                <a href="chat.html" class="nav-btn active">🤖 AI聊天</a>
+                <a href="about.html" class="nav-btn">ℹ️ 关于</a>
+            </div>
+            
+            <!-- 聊天头部 -->
+            <div class="chat-header">
+                <h1>🤖 与波奇酱聊天</h1>
+                <p>我是波奇酱，一个有点社恐但很努力的AI助手... (>_<)</p>
+                <p class="status-badge">状态: <span id="chat-status">在线</span></p>
+            </div>
+            
+            <!-- 聊天主体 -->
+            <div class="chat-main">
+                <!-- 侧边栏 -->
+                <div class="chat-sidebar">
+                    <h2>💡 预设问题</h2>
+                    <button class="preset-question" onclick="askQuestion('介绍一下你自己')">
+                        🤔 介绍一下你自己
+                    </button>
+                    <button class="preset-question" onclick="askQuestion('这个网站有什么功能')">
+                        🚀 这个网站有什么功能
+                    </button>
+                    <button class="preset-question" onclick="askQuestion('如何监控币安价格')">
+                        📊 如何监控币安价格
+                    </button>
+                    <button class="preset-question" onclick="askQuestion('系统状态监控能做什么')">
+                        🖥️ 系统状态监控能做什么
+                    </button>
+                    <button class="preset-question" onclick="askQuestion('给我讲个笑话')">
+                        😄 给我讲个笑话
+                    </button>
+                    <button class="preset-question" onclick="askQuestion('今天的天气怎么样')">
+                        🌤️ 今天的天气怎么样
+                    </button>
+                    
+                    <h2 style="margin-top: 30px;">⚙️ 聊天设置</h2>
+                    <div style="margin-top: 15px;">
+                        <label style="display: block; margin-bottom: 10px;">
+                            <input type="checkbox" id="auto-scroll" checked>
+                            自动滚动到底部
+                        </label>
+                        <label style="display: block; margin-bottom: 10px;">
+                            <input type="checkbox" id="typing-effects" checked>
+                            打字机效果
+                        </label>
+                        <label style="display: block; margin-bottom: 10px;">
+                            <input type="checkbox" id="sound-effects" checked>
+                            音效提示
+                        </label>
+                    </div>
+                    
+                    <button onclick="clearChat()" class="control-btn" style="width: 100%; margin-top: 20px; padding: 12px;">
+                        🗑️ 清空聊天记录
+                    </button>
+                </div>
+                
+                <!-- 消息区域 -->
+                <div class="chat-messages">
+                    <div class="messages-container" id="messages-container">
+                        <!-- 初始欢迎消息 -->
+                        <div class="message bot">
+                            <div class="message-sender">波奇酱</div>
+                            <div class="message-content">
+                                啊...你好！我是波奇酱，一个有点社恐但很努力的AI助手...<br>
+                                墨宣让我创建了这个网站，现在可以通过这里和我聊天了！<br>
+                                (>_<)
+                            </div>
+                            <div class="message-time" id="message-time-0">刚刚</div>
+                        </div>
+                        
+                        <div class="message bot">
+                            <div class="message-sender">波奇酱</div>
+                            <div class="message-content">
+                                你可以：
+                                <ul>
+                                    <li>直接输入问题</li>
+                                    <li>点击侧边栏的预设问题</li>
+                                    <li>询问网站功能</li>
+                                    <li>或者随便聊点什么...</li>
+                                </ul>
+                                我会尽力回答的！
+                            </div>
+                            <div class="message-time" id="message-time-1">刚刚</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 输入区域 -->
+                    <div class="chat-input">
+                        <textarea 
+                            id="message-input" 
+                            placeholder="输入消息... (按Enter发送，Shift+Enter换行)"
+                            onkeydown="handleKeydown(event)"
+                        ></textarea>
+                        <button id="send-button" onclick="sendMessage()">
+                            发送
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部信息 -->
+            <div style="text-align: center; margin-top: 20px; opacity: 0.8; font-size: 0.9rem;">
+                <p>💡 提示: 这是一个前端演示，使用模拟AI回复。真实AI聊天需要后端API支持。</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2026 波奇酱制作 | AI聊天演示 | 模拟对话</p>
+        </footer>
+    </div>
+    
+    <script src="chat.js"></script>
+</body>
+</html>
