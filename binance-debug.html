@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>币安监控 - 调试版</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white; min-height: 100vh; padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 40px; padding: 20px; }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .debug-panel { background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .debug-log { background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; font-family: monospace; height: 200px; overflow-y: auto; margin-top: 10px; }
+        .price-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .price-table th, .price-table td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .positive { color: #4ade80; }
+        .negative { color: #ef4444; }
+        button { padding: 10px 20px; background: rgba(255,255,255,0.15); border: none; color: white; border-radius: 8px; cursor: pointer; margin: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 币安监控 - 调试版</h1>
+            <p>专门调试价格更新问题</p>
+        </header>
+        
+        <div class="debug-panel">
+            <h3>🔧 调试控制</h3>
+            <div>
+                <button onclick="manualTest()">🧪 手动测试</button>
+                <button onclick="checkTimer()">⏱️ 检查定时器</button>
+                <button onclick="forceUpdate()">🔄 强制更新</button>
+                <button onclick="clearLog()">🗑️ 清空日志</button>
+            </div>
+            <div class="debug-log" id="debug-log">
+                <div>等待初始化...</div>
+            </div>
+        </div>
+        
+        <table class="price-table" id="price-table">
+            <thead>
+                <tr>
+                    <th>币种</th>
+                    <th>价格 (USDT)</th>
+                    <th>涨跌</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody id="price-body">
+                <tr><td colspan="4">加载中...</td></tr>
+            </tbody>
+        </table>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button onclick="startAutoUpdate()">▶️ 启动自动更新</button>
+            <button onclick="stopAutoUpdate()">⏸️ 停止自动更新</button>
+            <button onclick="simulateChange()">🎲 模拟变化</button>
+        </div>
+    </div>
+    
+    <script>
+        // 调试日志
+        function log(msg) {
+            const logEl = document.getElementById('debug-log');
+            const entry = document.createElement('div');
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            logEl.appendChild(entry);
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(msg);
+        }
+        
+        function clearLog() {
+            document.getElementById('debug-log').innerHTML = '<div>日志已清空</div>';
+        }
+        
+        // 价格数据
+        const symbols = [
+            { name: '比特币', price: 65000, change: 0 },
+            { name: '以太坊', price: 3500, change: 0 },
+            { name: '币安币', price: 500, change: 0 }
+        ];
+        
+        let updateTimer = null;
+        let isRunning = false;
+        
+        // 初始化
+        function init() {
+            log('✅ 初始化开始');
+            updateTable();
+            startAutoUpdate();
+            log('✅ 初始化完成');
+        }
+        
+        // 更新价格
+        function updatePrices() {
+            log('🔄 开始更新价格');
+            symbols.forEach(symbol => {
+                const oldPrice = symbol.price;
+                const changePercent = (Math.random() - 0.5) * 0.1;
+                const changeAmount = oldPrice * changePercent;
+                symbol.price = oldPrice + changeAmount;
+                symbol.change = changePercent * 100;
+                log(`  ${symbol.name}: $${oldPrice.toFixed(2)} → $${symbol.price.toFixed(2)} (${symbol.change.toFixed(2)}%)`);
+            });
+        }
+        
+        // 更新表格
+        function updateTable() {
+            log('📋 更新表格显示');
+            const tbody = document.getElementById('price-body');
+            if (!tbody) {
+                log('❌ 找不到表格tbody元素');
+                return;
+            }
+            
+            tbody.innerHTML = symbols.map(symbol => `
+                <tr>
+                    <td><strong>${symbol.name}</strong></td>
+                    <td>$${symbol.price.toFixed(2)}</td>
+                    <td class="${symbol.change >= 0 ? 'positive' : 'negative'}">
+                        ${symbol.change >= 0 ? '↗' : '↘'} ${Math.abs(symbol.change).toFixed(2)}%
+                    </td>
+                    <td>
+                        <span style="display: inline-block; width: 60px; height: 6px; background: ${symbol.change >= 0 ? '#4ade80' : '#ef4444'}; border-radius: 3px;"></span>
+                    </td>
+                </tr>
+            `).join('');
+            
+            log('✅ 表格更新完成');
+        }
+        
+        // 启动自动更新
+        function startAutoUpdate() {
+            if (isRunning) {
+                log('⚠️ 自动更新已在运行中');
+                return;
+            }
+            
+            log('▶️ 启动自动更新 (3秒间隔)');
+            isRunning = true;
+            updateTimer = setInterval(() => {
+                log('--- 定时器触发 ---');
+                updatePrices();
+                updateTable();
+            }, 3000);
+        }
+        
+        // 停止自动更新
+        function stopAutoUpdate() {
+            if (updateTimer) {
+                log('⏸️ 停止自动更新');
+                clearInterval(updateTimer);
+                updateTimer = null;
+                isRunning = false;
+            }
+        }
+        
+        // 测试函数
+        function manualTest() {
+            log('🧪 开始手动测试');
+            log('1. 更新价格');
+            updatePrices();
+            log('2. 更新表格');
+            updateTable();
+            log('✅ 手动测试完成');
+        }
+        
+        function checkTimer() {
+            log(`⏱️ 定时器状态: ${updateTimer ? '运行中' : '已停止'}`);
+            log(`🔄 自动更新: ${isRunning ? '开启' : '关闭'}`);
+        }
+        
+        function forceUpdate() {
+            log('💪 强制更新');
+            updatePrices();
+            updateTable();
+        }
+        
+        function simulateChange() {
+            log('🎲 模拟大幅变化');
+            symbols.forEach(symbol => {
+                symbol.price *= (Math.random() > 0.5 ? 1.1 : 0.9);
+                symbol.change = (symbol.price > 65000 ? 10 : -10);
+            });
+            updateTable();
+        }
+        
+        // 页面加载
+        document.addEventListener('DOMContentLoaded', init);
+        
+        // 全局函数
+        window.manualTest = manualTest;
+        window.checkTimer = checkTimer;
+        window.forceUpdate = forceUpdate;
+        window.startAutoUpdate = startAutoUpdate;
+        window.stopAutoUpdate = stopAutoUpdate;
+        window.simulateChange = simulateChange;
+    </script>
+</body>
+</html>

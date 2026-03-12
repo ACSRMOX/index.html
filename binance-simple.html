@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>币安监控 - 极简版</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white; min-height: 100vh; padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 40px; padding: 20px; }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .back-btn { display: inline-block; margin-top: 20px; padding: 10px 20px; background: rgba(255,255,255,0.1); border-radius: 10px; color: white; text-decoration: none; }
+        .price-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .price-table th, .price-table td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .price-table th { background: rgba(255,255,255,0.05); }
+        .positive { color: #4ade80; }
+        .negative { color: #ef4444; }
+        .controls { display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
+        button { padding: 10px 20px; background: rgba(255,255,255,0.15); border: none; color: white; border-radius: 8px; cursor: pointer; }
+        button:hover { background: rgba(255,255,255,0.25); }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 30px 0; }
+        .stat-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; }
+        .update-time { text-align: center; margin-top: 30px; opacity: 0.7; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 币安价格监控</h1>
+            <p>极简版本 - 无需Chart.js，国内可访问</p>
+            <a href="index.html" class="back-btn">← 返回首页</a>
+        </header>
+        
+        <div class="controls">
+            <button onclick="refreshPrices()">🔄 刷新价格</button>
+            <button onclick="toggleAutoUpdate()">⏯️ 自动更新: <span id="auto-status">开启</span></button>
+            <button onclick="simulatePump()">🚀 模拟暴涨</button>
+            <button onclick="simulateDump()">📉 模拟暴跌</button>
+            <select onchange="changeInterval(this.value)" style="padding: 10px; background: rgba(255,255,255,0.1); color: white; border: none; border-radius: 8px;">
+                <option value="3">3秒更新</option>
+                <option value="5">5秒更新</option>
+                <option value="10">10秒更新</option>
+                <option value="30">30秒更新</option>
+            </select>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div>📈 平均涨跌</div>
+                <div id="avg-change" class="positive">+0.00%</div>
+            </div>
+            <div class="stat-card">
+                <div>✅ 上涨币种</div>
+                <div id="gainers">0个</div>
+            </div>
+            <div class="stat-card">
+                <div>❌ 下跌币种</div>
+                <div id="losers">0个</div>
+            </div>
+            <div class="stat-card">
+                <div>⏱️ 更新时间</div>
+                <div id="last-update">--:--:--</div>
+            </div>
+        </div>
+        
+        <table class="price-table" id="price-table">
+            <thead>
+                <tr>
+                    <th>币种</th>
+                    <th>代码</th>
+                    <th>价格 (USDT)</th>
+                    <th>24h涨跌</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody id="price-body">
+                <!-- 价格数据会动态插入 -->
+            </tbody>
+        </table>
+        
+        <div class="update-time">
+            <p>最后更新: <span id="update-time">--:--:--</span></p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">数据为模拟生成，非真实交易数据</p>
+        </div>
+    </div>
+    
+    <script>
+        // 简单价格模拟器
+        const symbols = [
+            { symbol: 'BTCUSDT', name: '比特币', price: 65000 },
+            { symbol: 'ETHUSDT', name: '以太坊', price: 3500 },
+            { symbol: 'BNBUSDT', name: '币安币', price: 500 },
+            { symbol: 'SOLUSDT', name: 'Solana', price: 150 },
+            { symbol: 'XRPUSDT', name: '瑞波币', price: 0.6 },
+            { symbol: 'ADAUSDT', name: 'Cardano', price: 0.5 }
+        ];
+        
+        let updateInterval = 3000;
+        let autoUpdateTimer = null;
+        let isAutoUpdating = true;
+        
+        // 初始化
+        function init() {
+            console.log('✅ 极简版币安监控初始化');
+            updatePrices();
+            updateTable();
+            startAutoUpdate();
+        }
+        
+        // 更新价格
+        function updatePrices() {
+            symbols.forEach(symbol => {
+                const oldPrice = symbol.price || 1;
+                const changePercent = (Math.random() - 0.5) * 0.1; // ±5%
+                const changeAmount = oldPrice * changePercent;
+                symbol.price = oldPrice + changeAmount;
+                symbol.change = changePercent * 100;
+                
+                if (symbol.price < 0.01) symbol.price = 0.01;
+            });
+        }
+        
+        // 更新表格
+        function updateTable() {
+            const tbody = document.getElementById('price-body');
+            if (!tbody) return;
+            
+            tbody.innerHTML = symbols.map(symbol => `
+                <tr>
+                    <td><strong>${symbol.name}</strong></td>
+                    <td><code>${symbol.symbol}</code></td>
+                    <td>$${symbol.price.toFixed(2)}</td>
+                    <td class="${symbol.change >= 0 ? 'positive' : 'negative'}">
+                        ${symbol.change >= 0 ? '↗' : '↘'} ${Math.abs(symbol.change).toFixed(2)}%
+                    </td>
+                    <td>
+                        <span style="display: inline-block; width: 60px; height: 6px; background: ${symbol.change >= 0 ? '#4ade80' : '#ef4444'}; border-radius: 3px;"></span>
+                    </td>
+                </tr>
+            `).join('');
+            
+            updateStats();
+            updateTime();
+        }
+        
+        // 更新统计
+        function updateStats() {
+            const totalChange = symbols.reduce((sum, s) => sum + (s.change || 0), 0);
+            const avgChange = totalChange / symbols.length;
+            const gainers = symbols.filter(s => (s.change || 0) > 0).length;
+            const losers = symbols.filter(s => (s.change || 0) < 0).length;
+            
+            document.getElementById('avg-change').textContent = 
+                `${avgChange >= 0 ? '+' : ''}${avgChange.toFixed(2)}%`;
+            document.getElementById('avg-change').className = avgChange >= 0 ? 'positive' : 'negative';
+            
+            document.getElementById('gainers').textContent = `${gainers}个`;
+            document.getElementById('losers').textContent = `${losers}个`;
+        }
+        
+        // 更新时间
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN', {hour12: false});
+            document.getElementById('update-time').textContent = timeStr;
+            document.getElementById('last-update').textContent = timeStr;
+        }
+        
+        // 刷新价格
+        function refreshPrices() {
+            updatePrices();
+            updateTable();
+            
+            const btn = event?.target;
+            if (btn) {
+                const originalText = btn.textContent;
+                btn.textContent = '✅ 已刷新';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 1000);
+            }
+        }
+        
+        // 切换自动更新
+        function toggleAutoUpdate() {
+            if (isAutoUpdating) {
+                stopAutoUpdate();
+                document.getElementById('auto-status').textContent = '关闭';
+                event.target.style.background = 'rgba(239, 68, 68, 0.2)';
+            } else {
+                startAutoUpdate();
+                document.getElementById('auto-status').textContent = '开启';
+                event.target.style.background = 'rgba(74, 222, 128, 0.2)';
+            }
+            isAutoUpdating = !isAutoUpdating;
+        }
+        
+        // 开始自动更新
+        function startAutoUpdate() {
+            if (autoUpdateTimer) clearInterval(autoUpdateTimer);
+            autoUpdateTimer = setInterval(() => {
+                updatePrices();
+                updateTable();
+            }, updateInterval);
+        }
+        
+        // 停止自动更新
+        function stopAutoUpdate() {
+            if (autoUpdateTimer) {
+                clearInterval(autoUpdateTimer);
+                autoUpdateTimer = null;
+            }
+        }
+        
+        // 模拟暴涨
+        function simulatePump() {
+            symbols.forEach(symbol => {
+                symbol.price *= 1.15;
+                symbol.change = 15;
+            });
+            updateTable();
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '🚀 暴涨中...';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                updatePrices();
+                updateTable();
+            }, 3000);
+        }
+        
+        // 模拟暴跌
+        function simulateDump() {
+            symbols.forEach(symbol => {
+                symbol.price *= 0.85;
+                symbol.change = -15;
+            });
+            updateTable();
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '📉 暴跌中...';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                updatePrices();
+                updateTable();
+            }, 3000);
+        }
+        
+        // 更改更新间隔
+        function changeInterval(seconds) {
+            updateInterval = parseInt(seconds) * 1000;
+            if (isAutoUpdating) {
+                stopAutoUpdate();
+                startAutoUpdate();
+            }
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+        
+        // 全局函数
+        window.refreshPrices = refreshPrices;
+        window.toggleAutoUpdate = toggleAutoUpdate;
+        window.simulatePump = simulatePump;
+        window.simulateDump = simulateDump;
+        window.changeInterval = changeInterval;
+    </script>
+</body>
+</html>
