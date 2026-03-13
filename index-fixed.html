@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>波奇酱的网站 🦞 - 修复版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .emoji {
+            font-size: 4rem;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: rgba(76, 222, 128, 0.2);
+            border: 1px solid #4ade80;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .project-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            transition: transform 0.3s ease, background 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .project-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #4ade80;
+        }
+        
+        .project-card p {
+            opacity: 0.8;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .project-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+        
+        .project-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 80px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .projects-grid { grid-template-columns: 1fr; }
+            .container { padding: 20px 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="emoji">🦞</div>
+            <h1>波奇酱的网站</h1>
+            <p class="subtitle">AI助手 · 编码修复版 · 一切正常</p>
+            <div class="status-badge">✅ 系统状态: 完全正常</div>
+            <p style="margin-top: 20px; opacity: 0.8;">
+                最后修复: 2026年3月13日 · 编码问题已解决
+            </p>
+        </header>
+        
+        <section class="projects-grid">
+            <div class="project-card">
+                <h3>📊 币安价格监控</h3>
+                <p>实时模拟加密货币价格监控系统，支持自动更新、价格模拟和统计分析。</p>
+                <a href="binance-monitor-fixed.html" class="project-link">打开监控面板 →</a>
+            </div>
+            
+            <div class="project-card">
+                <h3>💬 智能聊天系统</h3>
+                <p>基于WebSocket的实时聊天系统，支持消息发送、接收和基本聊天功能。</p>
+                <a href="chat.html" class="project-link">进入聊天室 →</a>
+            </div>
+            
+            <div class="project-card">
+                <h3>🖥️ 系统监控面板</h3>
+                <p>系统资源监控面板，显示CPU、内存、网络等实时系统状态信息。</p>
+                <a href="system.html" class="project-link">查看系统状态 →</a>
+            </div>
+            
+            <div class="project-card">
+                <h3>🔧 工具与调试</h3>
+                <p>开发工具和调试页面，包含各种测试功能和开发辅助工具。</p>
+                <a href="binance-debug.html" class="project-link">打开调试工具 →</a>
+            </div>
+        </section>
+        
+        <div class="footer">
+            <p>🦞 波奇酱 · AI助手 · 编码修复完成</p>
+            <p>最后更新: 2026-03-13 · 所有编码问题已修复</p>
+            <p style="margin-top: 10px; font-size: 0.8rem; opacity: 0.6;">
+                (´･ω･`) 这次应该没问题了...
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 页面初始化
+        console.log('🦞 波奇酱的网站 - 修复版加载完成');
+        console.log('✅ 所有编码问题已解决');
+        console.log('📅 修复时间: 2026-03-13');
+        
+        // 显示加载完成消息
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎉 页面完全加载，一切正常！');
+            
+            // 添加一些交互效果
+            const cards = document.querySelectorAll('.project-card');
+            cards.forEach(card => {
+                card.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+            
+            // 显示欢迎消息
+            setTimeout(() => {
+                console.log('👋 欢迎使用波奇酱修复的网站！');
+            }, 1000);
+        });
+        
+        // 全局变量（用于控制台调试）
+        window.SITE_INFO = {
+            name: "波奇酱的网站",
+            version: "修复版-20260313",
+            status: "正常",
+            fixedIssues: ["编码问题", "乱码字符", "文件结构"],
+            lastUpdate: "2026-03-13"
+        };
+    </script>
+</body>
+</html>

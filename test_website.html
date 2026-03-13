@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>网站测试</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .pass { background: #d4edda; }
+        .fail { background: #f8d7da; }
+    </style>
+</head>
+<body>
+    <h1>网站文件测试报告</h1>
+    
+    <div class="test">
+        <h3>1. 检查文件是否存在</h3>
+        <div id="file-check"></div>
+    </div>
+    
+    <div class="test">
+        <h3>2. 检查HTML语法</h3>
+        <div id="html-check"></div>
+    </div>
+    
+    <div class="test">
+        <h3>3. 检查JavaScript引用</h3>
+        <div id="js-check"></div>
+    </div>
+    
+    <script>
+        // 检查文件是否存在
+        const files = [
+            'binance-fixed-final.html',
+            'binance.js',
+            'index.html',
+            'style.css',
+            'chat.html',
+            'system.html'
+        ];
+        
+        const fileCheck = document.getElementById('file-check');
+        files.forEach(file => {
+            const div = document.createElement('div');
+            div.textContent = `检查 ${file}... `;
+            
+            fetch(file)
+                .then(response => {
+                    if (response.ok) {
+                        div.textContent += '✅ 存在';
+                        div.className = 'pass';
+                    } else {
+                        div.textContent += '❌ 不存在';
+                        div.className = 'fail';
+                    }
+                })
+                .catch(() => {
+                    div.textContent += '❌ 无法访问';
+                    div.className = 'fail';
+                });
+            
+            fileCheck.appendChild(div);
+        });
+        
+        // 检查HTML文件
+        const htmlCheck = document.getElementById('html-check');
+        const htmlFiles = ['binance-fixed-final.html', 'index.html'];
+        
+        htmlFiles.forEach(file => {
+            const div = document.createElement('div');
+            div.textContent = `检查 ${file} 结构... `;
+            
+            fetch(file)
+                .then(response => response.text())
+                .then(text => {
+                    if (text.includes('<!DOCTYPE html>') && text.includes('</html>')) {
+                        div.textContent += '✅ 基本结构正确';
+                        div.className = 'pass';
+                    } else {
+                        div.textContent += '❌ 结构可能有问题';
+                        div.className = 'fail';
+                    }
+                })
+                .catch(() => {
+                    div.textContent += '❌ 无法读取';
+                    div.className = 'fail';
+                });
+            
+            htmlCheck.appendChild(div);
+        });
+        
+        // 检查JS文件
+        const jsCheck = document.getElementById('js-check');
+        const jsFiles = ['binance.js', 'script.js'];
+        
+        jsFiles.forEach(file => {
+            const div = document.createElement('div');
+            div.textContent = `检查 ${file}... `;
+            
+            fetch(file)
+                .then(response => response.text())
+                .then(text => {
+                    if (text.includes('function') || text.includes('const') || text.includes('let')) {
+                        div.textContent += '✅ 包含JavaScript代码';
+                        div.className = 'pass';
+                    } else {
+                        div.textContent += '❌ 可能不是有效的JS文件';
+                        div.className = 'fail';
+                    }
+                })
+                .catch(() => {
+                    div.textContent += '❌ 无法读取';
+                    div.className = 'fail';
+                });
+            
+            jsCheck.appendChild(div);
+        });
+    </script>
+</body>
+</html>
